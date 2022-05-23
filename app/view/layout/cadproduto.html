@@ -1,0 +1,50 @@
+<div class="container">
+    <div class="justify-content-center g-5">
+        <hr>
+        <div class="clearfix">
+            <div class="float-start">
+                <h1>Cadastro de Produtos</h1>
+            </div>
+        </div>
+        <hr>
+        <div>
+            <form action="index.php" method="post">
+                <input type="hidden" name="pg" value="cadproduto">
+                <input type="hidden" name="act" value="{{act}}">
+                <input type="hidden" name="procodigo" value="{{procodigo}}">
+                <fieldset>
+                    <div class="row row-cols-3">
+                        <div class="col-5">
+                            <div class="input-group mb-3">
+                                <span class="input-group-text">Produto: {{procodigo}} </span>
+                                <input type="text" class="form-control" name="pronome" id="pronome" maxlength="100" required="required" {{pronome}} >
+                            </div>
+                        </div>
+                        <div class="col-3">
+                            <div class="input-group mb-3">
+                                <span class="input-group-text">Preço - R$</span>
+                                <input type="number" class="form-control" name="propreco" id="propreco" step="0.01" required="required" {{propreco}} >
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="input-group mb-3">
+                                <span class="input-group-text">Link da Imagem</span>
+                                <input class="form-control" type="url" name="proimgurl" id="proimgurl" {{proimgurl}} >
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="input-group">
+                            <span class="input-group-text">Decrição Detalhada</span>
+                            <textarea class="form-control" aria-label="Decrição Detalhada" name="prodescricao" id="prodescricao" maxlength="2000" style="height: 157px;" required="required" >{{prodescricao}}</textarea>
+                        </div>
+                    </div>
+                    <div class="clearfix">
+                        <br><button type="submit" class="btn btn-success float-end">{{botao}}</button>
+                    </div>
+                </fieldset>
+            </form>
+        </div>
+        <hr>
+    </div>
+</div>

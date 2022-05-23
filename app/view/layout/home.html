@@ -1,0 +1,20 @@
+<div class="container mt-5 mb-5">
+    <div class="row row-cols-auto justify-content-center g-5">
+        <div style="padding: 10px;" class="mx-auto alert alert-secondary">
+            <form action="index.php" method="get" class="mx-auto ">
+
+                <b>Buscar por:</b>
+                <input type="hidden" name="pg" value="home">
+                <label for="pronome">Produto</label>
+                <input type="text" name="pronome" id="pronome" maxlength="100" >
+                <label for="prodescricao">Descrição</label>
+                <input type="text" name="prodescricao" id="prodescricao" maxlength="100">
+                <label for="propreco">Preço</label>
+                <input type="number" name="propreco" id="propreco" "step="0.01">
+                <input type="submit" value="Filtrar" name="act" class="btn btn-secondary">
+
+            </form>
+        </div>
+        {{homeContent}}
+    </div>
+</div>

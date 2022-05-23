@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project-private xmlns="http://www.netbeans.org/ns/project-private/1">
+    <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
+    <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
+        <group>
+            <file>file:/C:/xampp/htdocs/FuscaShop/app/view/layout/cadproduto.html</file>
+            <file>file:/C:/xampp/htdocs/FuscaShop/app/view/layout/usuario.html</file>
+            <file>file:/C:/xampp/htdocs/FuscaShop/app/controller/ControllerPadrao.php</file>
+            <file>file:/C:/xampp/htdocs/FuscaShop/app/view/layout/page.html</file>
+            <file>file:/C:/xampp/htdocs/FuscaShop/app/model/ModelProduto.php</file>
+            <file>file:/C:/xampp/htdocs/FuscaShop/app/view/layout/produto.html</file>
+            <file>file:/C:/xampp/htdocs/FuscaShop/vendor/composer/ClassLoader.php</file>
+            <file>file:/C:/xampp/htdocs/FuscaShop/app/model/ModelCarrinho.php</file>
+            <file>file:/C:/xampp/htdocs/FuscaShop/app/controller/ControllerCadProduto.php</file>
+            <file>file:/C:/xampp/htdocs/FuscaShop/app/model/ModelPadrao.php</file>
+            <file>file:/C:/xampp/htdocs/FuscaShop/app/model/ModelUsuario.php</file>
+            <file>file:/C:/xampp/htdocs/FuscaShop/index.php</file>
+            <file>file:/C:/xampp/htdocs/FuscaShop/app/view/ViewProduto.php</file>
+            <file>file:/C:/xampp/htdocs/FuscaShop/app/view/layout/header.html</file>
+            <file>file:/C:/xampp/htdocs/FuscaShop/app/view/ViewCadProduto.php</file>
+            <file>file:/C:/xampp/htdocs/FuscaShop/app/model/ModelCadProduto.php</file>
+            <file>file:/C:/xampp/htdocs/FuscaShop/app/view/ViewUsuario.php</file>
+            <file>file:/C:/xampp/htdocs/FuscaShop/app/view/ViewHeader.php</file>
+            <file>file:/C:/xampp/htdocs/FuscaShop/app/view/layout/usuarios.html</file>
+            <file>file:/C:/xampp/htdocs/FuscaShop/app/view/ViewUsuarios.php</file>
+            <file>file:/C:/xampp/htdocs/FuscaShop/app/controller/ControllerUsuario.php</file>
+            <file>file:/C:/xampp/htdocs/FuscaShop/app/view/ViewPadrao.php</file>
+            <file>file:/C:/xampp/htdocs/FuscaShop/app/controller/ControllerCarrinho.php</file>
+            <file>file:/C:/xampp/htdocs/FuscaShop/app/view/layout/carrinho.html</file>
+            <file>file:/C:/xampp/htdocs/FuscaShop/routes.php</file>
+            <file>file:/C:/xampp/htdocs/FuscaShop/app/controller/ControllerProduto.php</file>
+            <file>file:/C:/xampp/htdocs/FuscaShop/app/controller/ControllerHome.php</file>
+            <file>file:/C:/xampp/htdocs/FuscaShop/app/view/ViewCarrinho.php</file>
+        </group>
+    </open-files>
+</project-private>

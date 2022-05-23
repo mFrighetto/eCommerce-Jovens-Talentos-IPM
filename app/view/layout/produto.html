@@ -1,0 +1,35 @@
+<div class="container">
+    <div class="justify-content-center g-5">
+        <hr>
+        <div class="clearfix">
+            <div class="float-start">
+                <h1>Gestão de produtos</h1>
+            </div>
+            <div class="float-end">
+                <a class="btn btn-outline-success" role="button" href="index.php?pg=cadproduto">
+                    <span class="p-2"><i class="fa-solid fa-plus"></i></spam> Cadastrar Produto
+                </a> 
+                <a class="btn btn-outline-primary" data-bs-toggle="collapse" href="#collapseForm"  aria-expanded="false" aria-controls="collapseForm">
+                    Filtrar produtos
+                </a>
+            </div>
+        </div>
+        <div class="collapse text-center" id="collapseForm">
+            <form action="index.php" method="get">
+                <input type="hidden" name="pg" value="produto">
+                <label for="pronome">Produto</label>
+                <input type="text" name="pronome" id="pronome" maxlength="100" >
+                <label for="prodescricao">Descrição</label>
+                <input type="text" name="prodescricao" id="prodescricao" maxlength="100">
+                <label for="propreco">Preço</label>
+                <input type="number" name="propreco" id="propreco" step="0.01">
+                <input type="submit" value="Filtrar" name="act" class="btn btn-outline-primary">
+            </form>
+        </div>
+        <hr>
+        <div>
+            {{tabelaProduto}}
+        </div>
+        <hr>
+    </div>
+</div>
