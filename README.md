@@ -13,6 +13,4 @@ O sistema possui 3 níveis de acesso, compreendendo acesso público, usuário no
 
 Para acessar como administrador utilizar o seguintes usuário e senha (admin@mail.com, admin);
 Para acesso como usuário normal é possível realizar cadastro a partir da página de login;
-
-
-
+Caso algum usuário esqueça a sua senha, é possível aos administradores resetar a mesma para o valor padrão 123;
