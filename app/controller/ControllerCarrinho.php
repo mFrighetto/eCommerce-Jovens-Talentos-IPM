@@ -2,112 +2,156 @@
 
 namespace App\Controller;
 
-use App\Controller\ControllerPadrao;
-use App\Model\ModelCarrinho;
-use App\View\ViewCarrinho;
-
+use App\Controller\ControllerPadrao,
+    App\Model\ModelCarrinho,
+    App\View\ViewCarrinho;
 
 class ControllerCarrinho extends ControllerPadrao {
-    
-    function processPage() {
-        if(!$this->getSession()->isLogged()){
-            $oControllerUsuario = new ControllerUsuario;
-            $oControllerUsuario->footerVars = [
-                'footerContent' => '<div class="alert alert-danger" role="alert">A ação acessada exige que o usurário esteja logado!!!'
-            ];
 
-            return $oControllerUsuario->processPage();
-        }
+    public function getModel() {
+        if (!isset($this->Model)) {
+            $this->setModel(new ModelCarrinho);
+        };
+        return $this->Model;
+    }
+
+    public function setModel($Model): void {
+        $this->Model = $Model;
+    }
+
+    function processPage() {
         
         $aWhere = $this->processWhere();
-        $oModelCarrinho = new ModelCarrinho;
-        $a = $oModelCarrinho->getCarrinho($aWhere);
-        $sTitle = 'FuscaShop - Carrinho';
-        $sContent = ViewCarrinho::render([
-            'tabelaProduto'=>ViewCarrinho::getTabelaProdutosCarrinho($a)
-        ]);
-        if (count($a)==0){
-            $this->footerVars = [
-            'footerContent' => '<div class="alert alert-info" role="alert">Você não possui produtos no seu carrinho!!!</div>'
-            ];
-        }else{
+
+        if (@$_GET['act']=='pedidos'){
+            if (!$this->getSession()->isAdminLogged()) {
+                $oControllerHome = new ControllerHome;
+                $oControllerHome->footerVars = [
+                    'footerContent' => '<div class="alert alert-danger" role="alert">A ação acessada exige que o usuário esteja logado e seja do tipo administrador!!!</div>'
+                ];
+
+                return $oControllerHome->processPage();
+            };
+            
             $this->footerVars = [
                 'footerContent' => ''
             ];
-        }
+           
+            
+            $a = $this->getModel()->getPedidos($aWhere);
+
+            $sTitle = 'FuscaShop - Pedidos';
+            $sContent = ViewCarrinho::render([
+                        'conteudo' => ViewCarrinho::getRelacaoPedidos($a),
+                        'titulo' => '<h1>Relação de Pedidos</h1>'
+            ]);
+
+        }else{
+        
+            if (!$this->getSession()->isLogged()) {
+                $oControllerUsuario = new ControllerUsuario;
+                $oControllerUsuario->footerVars = [
+                    'footerContent' => '<div class="alert alert-danger" role="alert">A ação acessada exige que o usuário esteja logado!!!'
+                ];
+
+                return $oControllerUsuario->processPage();
+            };
+
+            $a = $this->getModel()->getCarrinho($aWhere);
+
+            $sTitle = 'FuscaShop - Carrinho';
+            $sContent = ViewCarrinho::render([
+                        'conteudo' => ViewCarrinho::getTabelaProdutosCarrinho($a),
+                        'titulo' => '<h1>Seu carrinho!!</h1><p>Estes são os produtos que você selecionou para comprar. Sinta-se a vontade para realizar ajustes!!!</p>'
+            ]);
+
+            if (count($a) == 0) {
+                $this->footerVars = [
+                    'footerContent' => '<div class="alert alert-info" role="alert">Você não possui produtos no seu carrinho!!!</div>'
+                ];
+            } else {
+                $this->footerVars = [
+                    'footerContent' => ''
+                ];
+            };
+        };
         
         return parent::getPage(
             $sTitle,
             $sContent
         );
     }
-    
-    public function processWhere(){
-        
+
+    public function processWhere() {
+
         $pWhere = [];
-        $pWhere[]=' AND usucodigo = '.$_SESSION['usucodigo'].' ';
         
-        return $pWhere;
-        
-        /*ver que pode ser necessário
-         * if(@$_GET['act']=='Filtrar'){
+        if (@$_GET['act']!='pedidos'){
             
-            if($_GET['pronome']!=''){
-                $pWhere[]=" AND pronome ILIKE '%".$_GET['pronome']."%' ";
-            };
-            if($_GET['prodescricao']!=''){
-                $pWhere[]=" AND prodescricao ILIKE '%".$_GET['prodescricao']."%' ";
-            };
-            if($_GET['propreco']!=''){
-                $pWhere[]=' AND propreco = '.$_GET['propreco'].' ';
-            };
+            $pWhere[] = ' AND usucodigo = ' . $_SESSION['usucodigo'] . ' ';
             
         };
-        if (@$_GET['act']=='Alterar'){
-            $pWhere[]=" AND procodigo = ".$_GET['procodigo']." ";
-        }*/
+        
+        return $pWhere;
     }
+    
     function processUpdate() {
         
-        $oModelCarrinho = new ModelCarrinho;
-        $oModelCarrinho->setProCodigo($_POST['procodigo']);
-        $oModelCarrinho->setCarProQuantidade($_POST['carproquantidade']);
-        $this->footerVars=[
+        if (!$this->getSession()->isLogged()) {
+            $oControllerUsuario = new ControllerUsuario;
+            $oControllerUsuario->footerVars = [
+                'footerContent' => '<div class="alert alert-danger" role="alert">A ação acessada exige que o usuário esteja logado!!!'
+            ];
+
+            return $oControllerUsuario->processPage();
+        };
+
+        $this->getModel()->setProCodigo($_POST['procodigo']);
+        $this->getModel()->setCarProQuantidade($_POST['carproquantidade']);
+        $this->footerVars = [
             'footerContent' => ''
         ];
-        
-        if($oModelCarrinho->updateCarrinho()){
+
+        if ($this->getModel()->updateCarrinho()) {
             $this->footerVars = [
                 'footerContent' => '<div class="alert alert-success" role="alert">Alteração da quantidade realizada com Sucesso!</div>'
             ];
-        }else{
+        } else {
             $this->footerVars = [
-                'footerContent' => '<div class="alert alert-danger" role="alert">Não foi possível alterar a quantidade!<br>'.pg_last_error().'</div>'
+                'footerContent' => '<div class="alert alert-danger" role="alert">Não foi possível alterar a quantidade!<br>' . pg_last_error() . '</div>'
             ];
-            
         };
-        
+
         return $this->processPage();
     }
 
     function processDelete() {
-        $oModelCarrinho = new ModelCarrinho;
-        $oModelCarrinho->setProCodigo($_GET['procodigo']);
-        $this->footerVars=[
+        
+        if (!$this->getSession()->isLogged()) {
+            $oControllerUsuario = new ControllerUsuario;
+            $oControllerUsuario->footerVars = [
+                'footerContent' => '<div class="alert alert-danger" role="alert">A ação acessada exige que o usuário esteja logado!!!'
+            ];
+
+            return $oControllerUsuario->processPage();
+        };
+
+        $this->getModel()->setProCodigo($_GET['procodigo']);
+        $this->footerVars = [
             'footerContent' => ''
         ];
-        
-        if($oModelCarrinho->deleteProdutoCarrinho()){
+
+        if ($this->getModel()->deleteProdutoCarrinho()) {
             $this->footerVars = [
                 'footerContent' => '<div class="alert alert-success" role="alert">Exclusão realizada com Sucesso!</div>'
             ];
-        }else{
+        } else {
             $this->footerVars = [
-                'footerContent' => '<div class="alert alert-danger" role="alert">Não foi possível excluir o registro!<br>'.pg_last_error().'</div>'
+                'footerContent' => '<div class="alert alert-danger" role="alert">Não foi possível excluir o registro!<br>' . pg_last_error() . '</div>'
             ];
-            
         };
-        
+
         return $this->processPage();
     }
+
 }

@@ -10,7 +10,7 @@ class ViewHome extends ViewPadrao{
         $cards = '';
         
         foreach ($a as $key => $linha){
-            $cards .= '<div class="card alert alert-secondary mb-3 " style="width: 18rem;">
+            $cards .= '<div class="card alert alert-secondary" style="width: 16rem; margin:10px;">
                             <img src="'.$linha['proimgurl'].'" class="card-img-top">
                             <div class="card-body">
                                 <h5 class="card-title">'.$linha['pronome'].'</h5>

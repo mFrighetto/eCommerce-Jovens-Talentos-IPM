@@ -15,10 +15,11 @@ class ViewUsuarios extends ViewPadrao
                     <th scope="col" rowspan="2">#</th>
                     <th scope="col" rowspan="2">Nome</th>
                     <th scope="col" rowspan="2">E-mail</th>
-                    <th scope="col" colspan="4" class="text-center">Ações</th>
+                    <th scope="col" colspan="5" class="text-center">Ações</th>
                   </tr>
                   <tr>
                     <th class="text-center">Alterar</th>
+                    <th class="text-center">Reset Senha</th>
                     <th class="text-center">Excluir</th>
                     <th class="text-center">Ativo</th>
                     <th class="text-center">Admin</th>
@@ -30,8 +31,9 @@ class ViewUsuarios extends ViewPadrao
                         <th scope="row">'.$linha['usucodigo'].'</th>
                         <td>'.$linha['usunome'].'</td>
                         <td>'.$linha['usuemail'].'</td>
-                        <td class="text-center"><a class="text-warning" href="?pg=usuarios&act=altera&usucodigo='.$linha['usucodigo'].'"><span class="p-2"><i class="fa-solid fa-pen-to-square"></i></spam></a></td>';
-                        if ($linha['usucodigo']==$_SESSION['usucodigo']){
+                        <td class="text-center"><a class="text-warning" href="?pg=usuario&act=alterar&usucodigo='.$linha['usucodigo'].'"><span class="p-2"><i class="fa-solid fa-pen-to-square"></i></spam></a></td>
+                        <td class="text-center"><a class="text-warning" href="?pg=usuario&act=update&usucodigo='.$linha['usucodigo'].'&ususenha=123"><span class="p-2"><i class="fa-solid fa-key"></i></spam></a></td>';
+                        if ($linha['usucodigo']==@$_SESSION['usucodigo']){
                             $table .= '<td class="text-center"><span class="p-2"><i class="fa-solid fa-x text-danger"></i></spam></td>'
                                     . '<td class="text-center"><span class="p-2"><i class="fa-solid fa-user text-success"></i></spam></td>'
                                     . '<td class="text-center"><span class="p-2"><i class="fa-solid fa-crown text-success"></i></spam></td>';

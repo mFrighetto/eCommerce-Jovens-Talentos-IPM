@@ -5,11 +5,11 @@ namespace App\Model;
 use App\Db\Connection;
 
 class ModelCarrinho extends ModelPadrao {
-    
+
     private $usuCodigo;
     private $proCodigo;
     private $carProQuantidade;
-    
+
     public function getUsuCodigo() {
         return $this->usuCodigo;
     }
@@ -34,90 +34,88 @@ class ModelCarrinho extends ModelPadrao {
         $this->carProQuantidade = $carProQuantidade;
     }
 
-    function getTable(){
+    function getTable() {
         return 'tbcarrinho';
     }
+
     
-    function getCarrinho($aWhere){
-         $oConnection = Connection::get();
-        
-        $sql=   'SELECT procodigo,pronome,prodescricao,propreco,carproquantidade '
+    function insertCarrinho() {
+        return parent::insert([
+                    'procodigo' => $this->getProCodigo(),
+                    'usucodigo' => $this->getUsuCodigo(),
+                    'carproquantidade' => $this->getCarProQuantidade()
+        ]);
+    }
+    
+    function getCarrinho($aWhere) {
+        $oConnection = Connection::get();
+
+        $sql = 'SELECT procodigo,pronome,prodescricao,propreco,carproquantidade '
                 . 'FROM tbproduto '
                 . 'JOIN tbcarrinho USING (procodigo)'
                 . 'WHERE TRUE ';
         foreach ($aWhere as $aCriterio) {
-            $sql.= $aCriterio;
+            $sql .= $aCriterio;
         };
-        $oResult = pg_query($oConnection,$sql);
+        $sql .= ' ORDER BY pronome ASC';
+        
+        $oResult = pg_query($oConnection, $sql);
         $aData = [];
-        while ($aResultado = pg_fetch_assoc($oResult)){
+        
+        while ($aResultado = pg_fetch_assoc($oResult)) {
             $aData[] = $aResultado;
-        }
+        };
+        
         return $aData;
     }
-    /*function getProduto($procodigo){
-        $aWhere[] = ' AND procodigo = '.$procodigo;
-        $dados = $this->getAll($aWhere);
-        $this->setProCodigo($dados[0]['procodigo']);
-        $this->setProNome($dados[0]['pronome']);
-        $this->setProDescricao($dados[0]['prodescricao']);
-        $this->setProImgUrl($dados[0]['proimgurl']);
-        $this->setProPreco($dados[0]['propreco']);
-    }*/
     
-    function insertCarrinho(){
-        return parent::insert([
-            'procodigo'=> $this->getProCodigo(),
-            'usucodigo'=> $this->getUsuCodigo(),
-            'carproquantidade'=> $this->getCarProQuantidade()
-        ]);
+    function getPedidos($aWhere){
+        $oConnection = Connection::get();
+        $aData=[];
+        $i = 0;
+        
+        $sql =  'SELECT DISTINCT tbcarrinho.usucodigo, tbusuario.usunome, tbusuario.usuemail '
+                . ' FROM tbcarrinho JOIN tbusuario USING (usucodigo) WHERE TRUE ORDER BY tbusuario.usunome ASC ';
+        
+        $dResult = pg_query($oConnection, $sql);
+        while ($dResultado = pg_fetch_assoc($dResult)){
+            $aData[$i] = $dResultado;
+            $sql =  'SELECT tbcarrinho.procodigo, '
+                        . 'tbproduto.pronome, '
+                        . 'tbproduto.prodescricao, '
+                        . 'tbproduto.propreco, '
+                        . 'tbcarrinho.carproquantidade '
+                    . 'FROM tbcarrinho JOIN tbproduto USING(procodigo) '
+                    . 'WHERE TRUE '
+                    . 'AND tbcarrinho.usucodigo = '.$dResultado['usucodigo'].' '
+                    . 'ORDER BY tbproduto.pronome ASC ';
+            
+            $pResult = pg_query($oConnection, $sql);
+            while ($pResultado = pg_fetch_assoc($pResult)){
+                $aData[$i]['produtos'][] = $pResultado;
+            };
+            $i++;
+        };
+        
+        return $aData;
     }
-    
-    function updateCarrinho(){
+
+    function updateCarrinho() {
         return parent::update(
             [
-                'carproquantidade'=> $this->getCarProQuantidade()
-            ],[
-                'procodigo'=> $this->getProCodigo(),
-                'usucodigo'=> $_SESSION['usucodigo']
+                'carproquantidade' => $this->getCarProQuantidade()
+            ], [
+                'procodigo' => $this->getProCodigo(),
+                'usucodigo' => $_SESSION['usucodigo']
             ]
         );
     }
-    
-    function deleteProdutoCarrinho(){
+
+    function deleteProdutoCarrinho() {
         return parent::delete([
-            'procodigo'=> $this->getProCodigo(),
-            'usucodigo'=> $_SESSION['usucodigo']
+            'procodigo' => $this->getProCodigo(),
+            'usucodigo' => $_SESSION['usucodigo']
         ]);
     }
-    /*function updateProduto(){
-        return parent::update(
-            [
-                'pronome'=> $this->getProNome(),
-                'prodescricao'=> $this->getProDescricao(),
-                'proimgurl'=> $this->getProImgUrl(),
-                'propreco'=> $this->getProPreco()
-            ],[
-                'procodigo'=> $this->getProCodigo()
-            ]
-        );
-    }*/
-    /**
-     * Retorna o valor pronto para ser 
-     * adicionado no comando SQL
-     * @param mixed $xValue
-     * @return mixed
-     */
-    protected function getBdValue($xValue)
-    {
-        if (!empty($xValue) || !is_null($xValue)) {
-            if (is_string($xValue)) {
-                return '\'' . pg_escape_string($xValue) . '\'';
-            }
 
-            return $xValue;
-        }
-
-        return 'NULL';
-    }
 }

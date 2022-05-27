@@ -17,9 +17,9 @@ function render($sPage)
         case 'produto':
             return (new App\Controller\ControllerProduto)->render();
             break;
-        case 'cadproduto':
+      /*  case 'cadproduto':
             return (new App\Controller\ControllerCadProduto)->render();
-            break;
+            break; */
         case 'carrinho':
             return (new App\Controller\ControllerCarrinho)->render();
             break;

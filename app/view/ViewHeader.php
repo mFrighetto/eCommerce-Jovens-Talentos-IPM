@@ -36,7 +36,7 @@ class ViewHeader extends ViewPadrao {
                           <li><a class="dropdown-item" href="index.php?pg=produto" id="produto">
                           <span class="p-2"><i class="fa-solid fa-dolly"></i></span>
                           Produtos</a></li>
-                          <li><a class="dropdown-item" href="index.php?pg=pedido" id="pedido">
+                          <li><a class="dropdown-item" href="index.php?pg=carrinho&act=pedidos" id="pedidos">
                           <span class="p-2"><i class="fa-solid fa-truck"></i></span>
                           Pedidos</a></li>
                         </ul>
@@ -47,7 +47,10 @@ class ViewHeader extends ViewPadrao {
                 <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLogin" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                     <span class="p-2"><i class="fa-solid fa-user-gear"></i></span>'.$_SESSION['usunome'].'
                 </a>
-                    <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="navbarDropdownMenuLogin">
+                    <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end" aria-labelledby="navbarDropdownMenuLogin">
+                      <li><a class="dropdown-item" href="index.php?pg=usuario&act=alterar&usucodigo='.$_SESSION['usucodigo'].'" id="usuario">
+                      <span class="p-2"><i class="fa-solid fa-users"></i></span>
+                      Dados pessoais</a></li>
                       <li><a class="dropdown-item" href="index.php?act=logout" id="logout">
                       <span class="p-2"><i class="fa-solid fa-users"></i></span>
                       Logout</a></li>

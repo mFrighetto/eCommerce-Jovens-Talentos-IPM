@@ -8,70 +8,96 @@ use App\View\ViewUsuario;
 use App\View\ViewUsuarios;
 use App\Client\Session;
 
+class ControllerUsuario extends ControllerPadrao {
 
-class ControllerUsuario extends ControllerPadrao
-{
-    private $ModelUsuario;
-    
-    public function getModelUsuario() {
-        if (!isset($this->ModelUsuario)){
-            $this->setModelUsuario(new ModelUsuario);
+    public function getModel() {
+        if (!isset($this->Model)) {
+            $this->setModel(new ModelUsuario);
         };
-        return $this->ModelUsuario ;
+        return $this->Model;
     }
 
-    public function setModelUsuario($ModelUsuario): void {
-        $this->ModelUsuario = $ModelUsuario;
+    public function setModel($Model): void {
+        $this->Model = $Model;
     }
 
-    public function processPage()
-    {
+    public function processPage() {
         $sTitle = 'FuscaShop';
 
-        if (!isset($sAct)){
+        if (!isset($sAct)) {
             $sAct = $_GET['act'] ?? $_POST['act'] ?? '';
         };
-        if ($sAct == 'login'){
-            if($this->processLogin()){
+        
+        if ($sAct == 'login') {
+            
+            if ($this->processLogin()) {
+                
                 $oControlerHome = new ControllerHome;
                 $oControlerHome->footerVars = [
-                    'footerContent'=>'<div class="alert alert-success" role="alert"> Login realizado com sucesso!!</div>'
+                    'footerContent' => '<div class="alert alert-success" role="alert"> Login realizado com sucesso!!</div>'
                 ];
-                $_SESSION['usucodigo']= $this->ModelUsuario->getUsuCodigo();
-                $_SESSION['usunome']= $this->ModelUsuario->getUsuNome();
-                $_SESSION['usutipo']= $this->ModelUsuario->getUsuTipo();
-                return $oControlerHome->processPage();
                 
+                $_SESSION['usucodigo'] = $this->getModel()->getUsuCodigo();
+                $_SESSION['usunome'] = $this->getModel()->getUsuNome();
+                $_SESSION['usutipo'] = $this->getModel()->getUsuTipo();
+                
+                return $oControlerHome->processPage();
             } else {
                 $this->footerVars = [
-                    'footerContent'=>'<div class="alert alert-danger" role="alert">Login Inválido!! Tente novamente!!</div>'
+                    'footerContent' => '<div class="alert alert-danger" role="alert">Login Inválido!! Tente novamente!!</div>'
                 ];
             };
         };
         
-        if (in_array($sAct,['consulta','delete','update'])){
-            $aWhere = $this->processWhere();
-            $a = $this->getModelUsuario()->getAll($aWhere);
+        if (($sAct == 'update')&&(!$this->getSession()->isAdminLogged())){
+            return (new ControllerHome())->processPage();
+        };
+        
+        if (in_array($sAct, ['consulta', 'delete', 'update'])) {
             
+            if (!$this->getSession()->isAdminLogged()) {
+                $oControllerHome = new ControllerHome;
+                $oControllerHome->footerVars = [
+                    'footerContent' => '<div class="alert alert-danger" role="alert">A ação acessada exige que o usuário esteja logado e seja do tipo administrador!!!</div>'
+                ];
+
+                return $oControllerHome->processPage();
+            };
+            
+            $aWhere = $this->processWhere();
+            $a = $this->getModel()->getAll($aWhere);
+
             $sTitle = 'FuscaShop - Gestão de Usuários';
             $sContent = ViewUsuarios::render([
-                'tabelaUsuarios'=>ViewUsuarios::getTabelaUsuarios($a)
-             ]);
-        $this->footerVars = [
-            'footerContent' => '<div class="alert alert-info" role="alert">A busca retornou '.count($a).' resultados.</div>'
+                'tabelaUsuarios' => ViewUsuarios::getTabelaUsuarios($a)
+            ]);
+            
+            $this->footerVars = [
+                'footerContent' => '<div class="alert alert-info" role="alert">A busca retornou ' . count($a) . ' resultados.</div>'
             ];
             
-        }else{
-        
+        } else {
+            if ($sAct == 'alterar'){
+                $this->getModel()->getUsuario($_GET['usucodigo']);
+                if (!(($this->getSession()->isAdminLogged())||(($this->getSession()->isLogged()) && ($this->getModel()->getUsuCodigo() == $_SESSION['usucodigo'])))) {
+                
+                    $oControllerHome = new ControllerHome;
+                    $oControllerHome->footerVars = [
+                'footerContent' => '<div class="alert alert-danger" role="alert">A ação acessada exige que o usuário esteja logado e seja do tipo administrador!!!</div>'
+                    ];
+
+                    return $oControllerHome->processPage();
+                };
+                
+            };
             $sContent = ViewUsuario::render([
-                // Passar aqui os parâmetros do conteúdo da página
-                'formContent' => ($oViewUsuario = new ViewUsuario)->getFormUsuario($sAct)
+                        'formContent' => ($oViewUsuario = new ViewUsuario)->getFormUsuario($sAct,$this->getModel())
             ]);
         };
 
-        if(!isset($this->footerVars['footerContent'])){
+        if (!isset($this->footerVars['footerContent'])) {
             $this->footerVars = [
-                'footerContent'=>''
+                'footerContent' => ''
             ];
         }
 
@@ -80,105 +106,126 @@ class ControllerUsuario extends ControllerPadrao
             $sContent
         );
     }
-    
+
     protected function processLogin() {
-        $this->getModelUsuario()->setUsuEmail($_POST['usuemail']);
-        $this->getModelUsuario()->setUsuSenha(sha1($_POST['ususenha']));
         
-        return $this->getModelUsuario()->getLogin();
-    }   
-    
-    public function processWhere(){
-        $pWhere = [];
-        
-        if(@$_GET['act']=='Filtrar'){
-            
-            if($_GET['pronome']!=''){
-                $pWhere[]=" AND pronome ILIKE '%".$_GET['pronome']."%' ";
-            };
-            if($_GET['prodescricao']!=''){
-                $pWhere[]=" AND prodescricao ILIKE '%".$_GET['prodescricao']."%' ";
-            };
-            if($_GET['propreco']!=''){
-                $pWhere[]=' AND propreco = '.$_GET['propreco'].' ';
-            };
-            
-        };
-        if (@$_GET['act']=='Alterar'){
-            $pWhere[]=" AND procodigo = ".$_GET['procodigo']." ";
-        }
-        return $pWhere;
+        $this->getModel()->setUsuEmail($_POST['usuemail']);
+        $this->getModel()->setUsuSenha(sha1($_POST['ususenha']));
+
+        return $this->getModel()->getLogin();
     }
-    
 
     function processInsert() {
-        
-        $oModelUsuario = new ModelUsuario;
-        $oModelUsuario->setUsuNome($_POST['usunome']);
-        $oModelUsuario->setUsuEmail($_POST['usuemail']);
-        $oModelUsuario->setUsuSenha(sha1($_POST['ususenha']));
-        $oModelUsuario->setUsuTipo($_POST['usutipo'] ?? 1);
-        
-        if(!isset($this->footerVars['footerContent'])){
+
+        $this->getModel()->setUsuNome($_POST['usunome']);
+        $this->getModel()->setUsuEmail($_POST['usuemail']);
+        $this->getModel()->setUsuSenha(sha1($_POST['ususenha']));
+        $this->getModel()->setUsuTipo($_POST['usutipo'] ?? 1);
+
+        if (!isset($this->footerVars['footerContent'])) {
             $this->footerVars = [
-                'footerContent'=>''
+                'footerContent' => ''
             ];
-        }
-        
-        if($oModelUsuario->insertUsuario()){
+        };
+
+        if ($this->getModel()->insertUsuario()) {
             $this->footerVars = [
                 'footerContent' => '<div class="alert alert-success" role="alert">Cadastro de Usuário realizado com Sucesso!</div>'
             ];
-        }else{
+        } else {
             $sAct = 'cadastro';
             $this->footerVars = [
-                'footerContent' => '<div class="alert alert-danger" role="alert">Não foi realizar o seu cadastro!<br>'.pg_last_error().'</div>'
+                'footerContent' => '<div class="alert alert-danger" role="alert">Não foi realizar o seu cadastro!<br>' . pg_last_error() . '</div>'
             ];
-            
         };
-        
+
         return $this->processPage();
     }
     
+    public function processWhere() {
+        $pWhere = [];
+
+        if (@$_GET['act'] == 'Filtrar') {
+
+            if ($_GET['pronome'] != '') {
+                $pWhere[] = " AND pronome ILIKE '%" . $_GET['pronome'] . "%' ";
+            };
+            if ($_GET['prodescricao'] != '') {
+                $pWhere[] = " AND prodescricao ILIKE '%" . $_GET['prodescricao'] . "%' ";
+            };
+            if ($_GET['propreco'] != '') {
+                $pWhere[] = ' AND propreco = ' . $_GET['propreco'] . ' ';
+            };
+            
+        };
+        
+        if (@$_GET['act'] == 'Alterar') {
+            $pWhere[] = " AND procodigo = " . $_GET['procodigo'] . " ";
+        };
+        
+        return $pWhere;
+    }
+
     function processUpdate() {
-        $this->getModelUsuario()->setUsuCodigo($_GET['usucodigo']);
-        $this->getModelUsuario()->setUsuNome(@$_GET['usunome']);
-        $this->getModelUsuario()->setUsuEmail(@$_GET['usuemail']);
-        $this->getModelUsuario()->setUsuSenha(@$_GET['ususenha']);
-        $this->getModelUsuario()->setUsuAtivo(@$_GET['usuativo']);
-        $this->getModelUsuario()->setUsuTipo(@$_GET['usutipo']);
-                
-        if($this->getModelUsuario()->updateUsuario()){
+        if ((isset($_GET['usuativo']))or(isset($_GET['usutipo']))or(isset($_GET['ususenha']))){
+            
+            if (!$this->getSession()->isAdminLogged()) {
+                $oControllerHome = new ControllerHome;
+                $oControllerHome->footerVars = [
+                    'footerContent' => '<div class="alert alert-danger" role="alert">A ação acessada exige que o usuário esteja logado e seja do tipo administrador!!!</div>'
+                ];
+
+                return $oControllerHome->processPage();
+            };
+        };
+        
+        $this->getModel()->setUsuCodigo(@$_GET['usucodigo'] ?? @$_POST['usucodigo'] );
+        $this->getModel()->setUsuNome(@$_GET['usunome'] ?? @$_POST['usunome']);
+        $this->getModel()->setUsuEmail(@$_GET['usuemail'] ?? @$_POST['usuemail']);
+        $this->getModel()->setUsuSenha(@$_GET['ususenha'] ?? @$_POST['ususenha']);
+        $this->getModel()->setUsuAtivo(@$_GET['usuativo'] ?? @$_POST['usuativo']);
+        $this->getModel()->setUsuTipo(@$_GET['usutipo'] ?? @$_POST['usutipo']);
+
+        if ($this->getModel()->updateUsuario()) {
             $this->footerVars = [
                 'footerContent' => '<div class="alert alert-success" role="alert">Alteração de usuário realizada com Sucesso!</div>'
             ];
-        }else{
+        } else {
             $this->footerVars = [
-                'footerContent' => '<div class="alert alert-danger" role="alert">Não foi possível realizar a alteração do usuário!<br>'.pg_last_error().'</div>'
+                'footerContent' => '<div class="alert alert-danger" role="alert">Não foi possível realizar a alteração do usuário!<br>' . pg_last_error() . '</div>'
             ];
-            
         };
-        
+
         return $this->processPage();
     }
-    
+
     function processDelete() {
-        $this->getModelUsuario()->setUsuCodigo($_GET['usucodigo']);
-        $this->footerVars=[
+        
+        if (!$this->getSession()->isLogged()) {
+
+            $this->footerVars = [
+                'footerContent' => '<div class="alert alert-danger" role="alert">A ação acessada exige que o usuário esteja logado!!!'
+            ];
+
+            return $this->processPage();
+        }
+
+        $this->getModel()->setUsuCodigo($_GET['usucodigo']);
+        $this->footerVars = [
             'footerContent' => ''
         ];
-        
-        if($this->getModelUsuario()->deleteUsuario()){
+
+        if ($this->getModel()->deleteUsuario()) {
             $this->footerVars = [
                 'footerContent' => '<div class="alert alert-success" role="alert">Exclusão realizada com Sucesso!</div>'
             ];
-        }else{
+        } else {
             $this->footerVars = [
-                'footerContent' => '<div class="alert alert-danger" role="alert">Não foi possível excluir o registro!<br>'.pg_last_error().'</div>'
+                'footerContent' => '<div class="alert alert-danger" role="alert">Não foi possível excluir o registro!<br>' . pg_last_error() . '</div>'
             ];
-            
         };
-        
+
         return $this->processPage();
     }
+
 }

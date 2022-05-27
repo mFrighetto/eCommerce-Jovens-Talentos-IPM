@@ -5,14 +5,14 @@ namespace App\Model;
 use App\Db\Connection;
 
 class ModelUsuario extends ModelPadrao {
-    
+
     private $usuCodigo;
     private $usuNome;
     private $usuEmail;
     private $usuSenha;
     private $usuTipo;
     private $usuAtivo;
-    
+
     public function getUsuCodigo() {
         return $this->usuCodigo;
     }
@@ -61,85 +61,77 @@ class ModelUsuario extends ModelPadrao {
         $this->usuAtivo = $usuAtivo;
     }
 
-    function getUsuario($usucodigo){
-        $aWhere[] = ' AND usucodigo = '.$usucodigo;
+    function getTable() {
+        return 'tbusuario';
+    }
+
+    function insertUsuario() {
+        return parent::insert([
+                    'usunome' => $this->getUsuNome(),
+                    'usuemail' => $this->getUsuEmail(),
+                    'ususenha' => $this->getUsuSenha(),
+                    'usutipo' => $this->getUsuTipo()
+        ]);
+    }
+
+    function getUsuario($usucodigo) {
+        $aWhere[] = ' AND usucodigo = ' . $usucodigo;
         $dados = $this->getAll($aWhere);
         $this->setUsuCodigo($dados[0]['usucodigo']);
         $this->setUsuNome($dados[0]['usunome']);
+        $this->setUsuEmail($dados[0]['usuemail']);
         $this->setUsuSenha($dados[0]['ususenha']);
         $this->setUsuTipo($dados[0]['usutipo']);
         $this->setUsuAtivo($dados[0]['usuativo']);
     }
-    
-    function insertUsuario(){
-        return parent::insert([
-            'usunome'=> $this->getUsuNome(),
-            'usuemail'=> $this->getUsuEmail(),
-            'ususenha'=> $this->getUsuSenha(),
-            'usutipo'=> $this->getUsuTipo()
-        ]);
-    }
-    
-    function getLogin (){
+
+    function getLogin() {
         $sql = ' SELECT usucodigo, usunome, usutipo '
-               .' FROM '.$this->getTable()
-               .' WHERE TRUE '
-               .' AND usuativo = TRUE '
-               .' AND usuemail = '.$this->getBdValue($this->getUsuEmail())
-               .' AND ususenha = '.$this->getBdValue($this->getUsuSenha());
-        $aConsulta = pg_query(Connection::get(),$sql);
-        
-        
-        if (pg_num_rows($aConsulta)==1){
+                . ' FROM ' . $this->getTable()
+                . ' WHERE TRUE '
+                . ' AND usuativo = TRUE '
+                . ' AND usuemail = ' . $this->getBdValue($this->getUsuEmail())
+                . ' AND ususenha = ' . $this->getBdValue($this->getUsuSenha());
+        $aConsulta = pg_query(Connection::get(), $sql);
+
+        if (pg_num_rows($aConsulta) == 1) {
             $aConsulta = pg_fetch_assoc($aConsulta);
             $this->setUsuCodigo($aConsulta['usucodigo']);
             $this->setUsuNome($aConsulta['usunome']);
             $this->setUsuTipo($aConsulta['usutipo']);
             return true;
-        } else{
+        } else {
             return false;
         }
     }
 
-
-    function getTable(){
-        return 'tbusuario';
-    }
-    
-    function updateUsuario(){
-        $valores =[];
-        if (!is_null($this->getUsuNome())){$valores =['usunome' => $this->getUsuNome()];};
-        if (!is_null($this->getUsuEmail())){$valores =['usuemail' => $this->getUsuEmail()];};
-        if (!is_null($this->getUsuSenha())){$valores =['ususenha' => $this->getUsuSenha()];};
-        if (!is_null($this->getUsuAtivo())){$valores =['usuativo' => $this->getUsuAtivo()];};
-        if (!is_null($this->getUsuTipo())){$valores =['usutipo' => $this->getUsuTipo()];};
+    function updateUsuario() {
+        $valores = [];
+        if (!is_null($this->getUsuNome())) {
+            $valores['usunome'] = $this->getUsuNome();
+        };
+        if (!is_null($this->getUsuEmail())) {
+            $valores['usuemail'] = $this->getUsuEmail();
+        };
+        if (!is_null($this->getUsuSenha())) {
+            $valores['ususenha'] = sha1($this->getUsuSenha());
+        };
+        if (!is_null($this->getUsuAtivo())) {
+            $valores['usuativo'] = $this->getUsuAtivo();
+        };
+        if (!is_null($this->getUsuTipo())) {
+            $valores['usutipo'] = $this->getUsuTipo();
+        };
 
         $condicoes = ['usucodigo' => $this->getUsuCodigo()];
 
-        return parent::update($valores,$condicoes);
+        return parent::update($valores, $condicoes);
     }
-    
-    function deleteUsuario(){
+
+    function deleteUsuario() {
         return parent::delete([
-            'usucodigo'=> $this->getUsuCodigo()
+                    'usucodigo' => $this->getUsuCodigo()
         ]);
     }
-    /**
-     * Retorna o valor pronto para ser 
-     * adicionado no comando SQL
-     * @param mixed $xValue
-     * @return mixed
-     */
-    protected function getBdValue($xValue)
-    {
-        if (!empty($xValue) || !is_null($xValue)) {
-            if (is_string($xValue)) {
-                return '\'' . pg_escape_string($xValue) . '\'';
-            }
 
-            return $xValue;
-        }
-
-        return 'NULL';
-    }
 }

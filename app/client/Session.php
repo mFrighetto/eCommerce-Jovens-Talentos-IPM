@@ -75,7 +75,7 @@ class Session
             return $this->isLogged()&&($_SESSION['usutipo']>=2);
                 
     }
-
+    
     /**
      * Retorna o id do usuário
      * armazenado na sessão

@@ -9,9 +9,9 @@ class ViewProduto extends ViewPadrao
 {
     static function getHtmlProdutos($a){
         $table = '
-            <table class="table">
+            <table class="table table-secondary table-striped table-sm table-responsive">
                 <thead>
-                  <tr>
+                  <tr class="table-dark">
                     <th scope="col">#</th>
                     <th scope="col">Produto</th>
                     <th scope="col">Descrição</th>
@@ -26,7 +26,7 @@ class ViewProduto extends ViewPadrao
                         <td>'.$linha['pronome'].'</td>
                         <td>'.$linha['prodescricao'].'</td>
                         <td class="text-center"> R$ '.number_format($linha['propreco'],2,',','.').'</td>
-                        <td class="text-center"><a class="text-warning" href="?pg=cadproduto&act=altera&procodigo='.$linha['procodigo'].'"><span class="p-2"><i class="fa-solid fa-pen-to-square"></i></spam></a></td>
+                        <td class="text-center"><a class="text-warning" href="?pg=produto&act=altera&procodigo='.$linha['procodigo'].'"><span class="p-2"><i class="fa-solid fa-pen-to-square"></i></spam></a></td>
                         <td class="text-center"><a class="text-danger" href="?pg=produto&act=delete&procodigo='.$linha['procodigo'].'"><span class="p-2"><i class="fa-solid fa-x"></i></spam></a></td>
                       </tr>';
         };
